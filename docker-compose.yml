@@ -1,0 +1,28 @@
+services:
+  # FastAPI backend: REST API + the in-process scheduler that pings URLs.
+  backend:
+    build: ./backend
+    container_name: uptime-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      # Persist the registered URL list and file logs on the host so they
+      # survive container restarts / rebuilds.
+      - ./backend/data:/app/data
+      - ./backend/logs:/app/logs
+    restart: unless-stopped
+
+  # Static frontend served by Python's built-in HTTP server. Reuses the same
+  # python:3.12-slim image the backend is built on, so nothing extra is pulled.
+  frontend:
+    image: python:3.12-slim
+    container_name: uptime-frontend
+    working_dir: /site
+    command: python -m http.server 8080
+    volumes:
+      - ./frontend:/site
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+    restart: unless-stopped

@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+# Runtime data comes in as mounted volumes, not baked into the image.
+data/
+logs/
