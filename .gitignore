@@ -1,2 +1,3 @@
 backend/logs*
 logs/
+__pycache__

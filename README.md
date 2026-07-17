@@ -48,11 +48,13 @@ computes the **Total / Up / Down** summary at the top.
 
 ---
 
----
-
 ## Setup (1-line)
 
 Requires Docker with the engine running.
+
+```bash
+git clone https://github.com/iAdtya/UpTime-Monitor
+```
 
 ```bash
 docker compose up --build
@@ -69,7 +71,6 @@ Stop with `Ctrl+C`, then `docker compose down`.
 > the `fetch` runs in **your browser on the host**, and the backend's port 8000
 > is published to the host — no container-to-container networking needed.
 
----
 
 <!-- ## Architecture
 
@@ -97,7 +98,6 @@ Stop with `Ctrl+C`, then `docker compose down`.
 > registered target URLs every minute** and recording the results. The diagram
 > above reflects that corrected flow. -->
 
----
 
 <!-- ## Project structure
 
@@ -233,12 +233,6 @@ resource "aws_security_group_rule" "http" {
   # ... plus a matching rule for 8000, and an ALB in front for HTTPS + scaling
 }
 ```
-
-For a production version you'd front this with an ALB (HTTPS termination),
-run the backend as an autoscaling ECS service, and move logs to a managed
-store with a 1-day TTL — but that's beyond this MVP's scope.
-
----
 
 ## AI collaboration log
 
