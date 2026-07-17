@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Uptime Monitor</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="wrap">
+    <header class="header">
+      <div>
+        <h1>Uptime Monitor</h1>
+        <p class="sub">Pinging registered URLs every minute · <span id="refresh-note">auto-refreshing</span></p>
+      </div>
+      <div class="stats" id="stats">
+        <div class="stat"><span class="stat-num" id="stat-total">–</span><span class="stat-label">Total</span></div>
+        <div class="stat up"><span class="stat-num" id="stat-up">–</span><span class="stat-label">Up</span></div>
+        <div class="stat down"><span class="stat-num" id="stat-down">–</span><span class="stat-label">Down</span></div>
+      </div>
+    </header>
+
+    <form class="add-form" id="add-form">
+      <input
+        type="url"
+        id="url-input"
+        placeholder="https://example.com"
+        autocomplete="off"
+        required
+      />
+      <button type="submit" id="add-btn">Add URL</button>
+    </form>
+    <p class="msg" id="msg"></p>
+
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Status</th>
+            <th>URL</th>
+            <th>Code</th>
+            <th>Response</th>
+            <th>Last checked</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="rows">
+          <tr><td colspan="6" class="empty">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

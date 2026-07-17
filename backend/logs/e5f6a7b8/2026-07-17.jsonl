@@ -1,0 +1,5 @@
+{"checked_at": "2026-07-17T22:21:51.495812+00:00", "status_code": null, "response_time_ms": 75.47, "up": false, "error": "ConnectError"}
+{"checked_at": "2026-07-17T22:22:53.824527+00:00", "status_code": null, "response_time_ms": 18.27, "up": false, "error": "ConnectError"}
+{"checked_at": "2026-07-17T22:23:56.144476+00:00", "status_code": null, "response_time_ms": 23.54, "up": false, "error": "ConnectError"}
+{"checked_at": "2026-07-17T22:24:58.440754+00:00", "status_code": null, "response_time_ms": 22.27, "up": false, "error": "ConnectError"}
+{"checked_at": "2026-07-17T22:26:00.766620+00:00", "status_code": null, "response_time_ms": 121.6, "up": false, "error": "ConnectError"}
