@@ -41,7 +41,9 @@ The design that drove this build:
 ## Dashboard
 
 ![Dashboard](assets/dashboard.png)
+
 <hr>
+
 ![Graph](assets/graph.png)
 
 The frontend lists every monitored URL with a live up/down badge, HTTP code,
