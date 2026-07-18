@@ -64,9 +64,9 @@ function render(urls) {
     const checked = l ? timeAgo(l.checked_at) : "never";
     const safeUrl = escapeHtml(u.url);
     return `
-      <tr>
+      <tr class="url-row" data-id="${u.id}" data-url="${safeUrl}" title="Click to view history">
         <td>${statusBadge(l)}</td>
-        <td class="url-cell"><a href="${safeUrl}" target="_blank" rel="noopener">${safeUrl}</a></td>
+        <td class="url-cell">${safeUrl}</td>
         <td class="mono">${code}</td>
         <td class="mono">${rt}</td>
         <td class="muted">${checked}</td>
@@ -128,16 +128,108 @@ $("add-form").addEventListener("submit", async (e) => {
 
 rowsEl.addEventListener("click", async (e) => {
   const btn = e.target.closest(".del-btn");
-  if (!btn) return;
-  if (!confirm(`Stop monitoring ${btn.dataset.url}?`)) return;
-  btn.disabled = true;
-  if (await deleteUrl(btn.dataset.id)) {
-    load();
-  } else {
-    showMsg("Failed to delete URL.", "error");
-    btn.disabled = false;
+  if (btn) {
+    if (!confirm(`Stop monitoring ${btn.dataset.url}?`)) return;
+    btn.disabled = true;
+    if (await deleteUrl(btn.dataset.id)) {
+      load();
+    } else {
+      showMsg("Failed to delete URL.", "error");
+      btn.disabled = false;
+    }
+    return;
   }
+  const row = e.target.closest(".url-row");
+  if (row) openDetail(row.dataset.id, row.dataset.url);
 });
+
+// --- detail view (uptime + response-time history) -------------------------
+
+const modal = $("modal");
+const modalBody = $("modal-body");
+
+function fmtTime(iso) {
+  return new Date(iso).toLocaleString();
+}
+
+function barTitle(l) {
+  const state = l.up ? "Up" : "Down";
+  const code = l.status_code != null ? l.status_code : (l.error || "unreachable");
+  const rt = l.response_time_ms != null ? `${Math.round(l.response_time_ms)} ms` : "—";
+  return `${fmtTime(l.checked_at)}\n${state} · ${code} · ${rt}`;
+}
+
+function renderDetail(url, logs) {
+  if (logs.length === 0) {
+    return `<h2 class="modal-title">${escapeHtml(url)}</h2>
+      <p class="muted">No checks recorded yet. Give it a minute and reopen.</p>`;
+  }
+
+  // API returns newest-first; show oldest -> newest like a status page.
+  const chrono = logs.slice().reverse();
+  const upCount = chrono.filter((l) => l.up).length;
+  const uptime = ((upCount / chrono.length) * 100).toFixed(2);
+  const rts = chrono.filter((l) => l.response_time_ms != null).map((l) => l.response_time_ms);
+  const avgRt = rts.length ? Math.round(rts.reduce((a, b) => a + b, 0) / rts.length) : null;
+  const maxRt = Math.max(...rts, 1);
+  const latest = chrono[chrono.length - 1];
+
+  const uptimeBars = chrono
+    .map((l) => `<span class="ubar ${l.up ? "up" : "down"}" title="${barTitle(l)}"></span>`)
+    .join("");
+
+  const rtBars = chrono
+    .map((l) => {
+      const h = l.response_time_ms != null ? Math.max(4, (l.response_time_ms / maxRt) * 100) : 4;
+      return `<span class="rtbar ${l.up ? "up" : "down"}" style="height:${h}%" title="${barTitle(l)}"></span>`;
+    })
+    .join("");
+
+  return `
+    <h2 class="modal-title">
+      <span class="badge ${latest.up ? "up" : "down"}"><span class="dot"></span>${latest.up ? "Up" : "Down"}</span>
+      <a href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(url)}</a>
+    </h2>
+
+    <div class="detail-stats">
+      <div class="dstat"><span class="dstat-num">${uptime}%</span><span class="dstat-label">Uptime</span></div>
+      <div class="dstat"><span class="dstat-num">${avgRt != null ? avgRt + " ms" : "—"}</span><span class="dstat-label">Avg response</span></div>
+      <div class="dstat"><span class="dstat-num">${chrono.length}</span><span class="dstat-label">Checks</span></div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-head"><span>Uptime</span><span class="muted">${uptime}% uptime</span></div>
+      <div class="ustrip">${uptimeBars}</div>
+      <div class="detail-axis"><span>oldest</span><span>now</span></div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-head"><span>Response time</span><span class="muted">max ${Math.round(maxRt)} ms</span></div>
+      <div class="rtstrip">${rtBars}</div>
+      <div class="detail-axis"><span>oldest</span><span>now</span></div>
+    </div>`;
+}
+
+async function openDetail(id, url) {
+  modalBody.innerHTML = `<p class="muted">Loading history…</p>`;
+  modal.hidden = false;
+  try {
+    const res = await fetch(`${API_BASE}/urls/${id}/logs?limit=100`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    modalBody.innerHTML = renderDetail(url, await res.json());
+  } catch (err) {
+    modalBody.innerHTML = `<p class="msg error">Could not load history (${escapeHtml(err.message)}).</p>`;
+  }
+}
+
+function closeDetail() {
+  modal.hidden = true;
+  modalBody.innerHTML = "";
+}
+
+$("modal-close").addEventListener("click", closeDetail);
+modal.addEventListener("click", (e) => { if (e.target === modal) closeDetail(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !modal.hidden) closeDetail(); });
 
 // --- boot -----------------------------------------------------------------
 

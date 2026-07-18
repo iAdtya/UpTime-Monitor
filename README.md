@@ -46,6 +46,11 @@ The frontend lists every monitored URL with a live up/down badge, HTTP code,
 response time, and how long ago it was last checked. It auto-refreshes and
 computes the **Total / Up / Down** summary at the top.
 
+**Click any row** to open a detail view (status-page style) built from that
+URL's logs: an **uptime bar strip** (green = up, red = down, oldest → newest), a
+**response-time bar chart**, and summary stats (uptime %, average response time,
+total checks).
+
 ---
 
 ## Setup (1-line)
@@ -174,10 +179,14 @@ http://localhost:59999
 It appears as **Down · —**. This proves the monitor distinguishes reachable
 from unreachable hosts.
 
-**4. Delete a URL.** Click **Delete** on any row — it's removed and its logs are
+**4. View a URL's history.** Click any row to open its detail view — an uptime
+bar strip and response-time chart built from that URL's logs. Healthy URLs show
+a green strip and ~100% uptime; broken ones show red and 0%.
+
+**5. Delete a URL.** Click **Delete** on any row — it's removed and its logs are
 cleaned up.
 
-**5. Inspect the raw history** (optional):
+**6. Inspect the raw history** (optional):
 ```bash
 curl http://localhost:8000/urls/a1b2c3d4/logs
 ```
