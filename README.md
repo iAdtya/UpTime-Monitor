@@ -41,6 +41,8 @@ The design that drove this build:
 ## Dashboard
 
 ![Dashboard](assets/dashboard.png)
+<br>
+![Graph](assets/graph.png)
 
 The frontend lists every monitored URL with a live up/down badge, HTTP code,
 response time, and how long ago it was last checked. It auto-refreshes and
